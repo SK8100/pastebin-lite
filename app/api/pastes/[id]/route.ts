@@ -1,68 +1,45 @@
-// import kv from "@/lib/kv";
-// import { getPaste, isExpired } from "@/lib/paste";
-
-// export async function GET(
-//   _: Request,
-//   { params }: { params: { id: string } }
-// ) {
-//   const key = `paste:${params.id}`;
-//   const paste = await getPaste(params.id);
-
-//   if (!paste || await isExpired(paste)) {
-//     return Response.json({ error: "Not found" }, { status: 404 });
-//   }
-
-//   if (paste.remaining_views !== null) {
-//     if (paste.remaining_views <= 0) {
-//       return Response.json({ error: "Not found" }, { status: 404 });
-//     }
-
-//     paste.remaining_views -= 1;
-//     await kv.set(key, paste);
-//   }
-
-//   return Response.json({
-//     content: paste.content,
-//     remaining_views: paste.remaining_views,
-//     expires_at: paste.expires_at
-//       ? new Date(paste.expires_at).toISOString()
-//       : null,
-//   });
-// }
-
-
-import { redis } from "@/lib/kv";
-import { getPaste, isExpired } from "@/lib/paste";
 import { NextRequest, NextResponse } from "next/server";
+import { redis } from "@/lib/kv";
+import { nowMs } from "@/lib/time";
+import type { Paste } from "@/types/paste";
 
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } | Promise<{ id: string }> }
+  _req: NextRequest,
+  { params }: { params: { id: string } }
 ) {
-  // If params might be a promise, await it
-  const { id } = params instanceof Promise ? await params : params;
+  const id = params.id;
 
-  const key = `paste:${id}`;
-  const paste = await getPaste(id);
+  const paste = (await redis.get(`paste:${id}`)) as Paste | null;
 
-  if (!paste || await isExpired(paste)) {
+  if (!paste) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  if (paste.remaining_views !== null) {
-    if (paste.remaining_views <= 0) {
-      return NextResponse.json({ error: "Not found" }, { status: 404 });
-    }
-
-    paste.remaining_views -= 1;
-    await redis.set(key, paste);
+  // TTL check
+  if (paste.expiresAt && nowMs() >= paste.expiresAt) {
+    await redis.del(`paste:${id}`);
+    return NextResponse.json({ error: "Expired" }, { status: 404 });
   }
+
+  // View limit check
+  if (paste.remainingViews !== null) {
+    if (paste.remainingViews <= 0) {
+      await redis.del(`paste:${id}`);
+      return NextResponse.json(
+        { error: "View limit exceeded" },
+        { status: 404 }
+      );
+    }
+    paste.remainingViews -= 1;
+  }
+
+  await redis.set(`paste:${id}`, paste);
 
   return NextResponse.json({
     content: paste.content,
-    remaining_views: paste.remaining_views,
-    expires_at: paste.expires_at
-      ? new Date(paste.expires_at).toISOString()
+    remaining_views: paste.remainingViews,
+    expires_at: paste.expiresAt
+      ? new Date(paste.expiresAt).toISOString()
       : null,
   });
 }
