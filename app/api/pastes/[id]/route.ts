@@ -30,9 +30,7 @@
 //   });
 // }
 
-<<<<<<< HEAD
-import kv from "@/lib/kv";
-=======
+
 import { redis } from "@/lib/kv";
 >>>>>>> 79e72a6 (Switch persistence to Upstash Redis)
 import { getPaste, isExpired } from "@/lib/paste";
