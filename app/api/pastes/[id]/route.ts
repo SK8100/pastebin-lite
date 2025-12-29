@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-=======
+
 // import kv from "@/lib/kv";
 // import { getPaste, isExpired } from "@/lib/paste";
 
@@ -32,7 +31,6 @@
 //   });
 // }
 
->>>>>>> 1e23da1 (Resolve merge conflicts)
 import { redis } from "@/lib/kv";
 import { getPaste, isExpired } from "@/lib/paste";
 import { NextRequest, NextResponse } from "next/server";
