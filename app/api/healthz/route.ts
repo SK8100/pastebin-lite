@@ -1,4 +1,4 @@
-import kv from "@/lib/kv";
+import { redis } from "@/lib/kv";
 
 export async function GET() {
   try {
@@ -6,7 +6,7 @@ export async function GET() {
       return Response.json({ ok: false, reason: "kv_not_configured" });
     }
 
-    await kv.ping();
+    await redis.ping();
     return Response.json({ ok: true });
   } catch {
     return Response.json({ ok: false });

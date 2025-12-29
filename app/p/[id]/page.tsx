@@ -1,5 +1,5 @@
 import { getPaste, isExpired } from "@/lib/paste";
-import kv from "@/lib/kv";
+import { redis } from "@/lib/kv";
 import { notFound } from "next/navigation";
 
 export default async function PastePage({
@@ -21,7 +21,7 @@ export default async function PastePage({
   if (paste.remaining_views !== null) {
     if (paste.remaining_views <= 0) notFound();
     paste.remaining_views -= 1;
-    await kv.set(key, paste);
+    await redis.set(key, paste);
   }
 
   return (

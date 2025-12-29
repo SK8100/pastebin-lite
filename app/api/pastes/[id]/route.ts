@@ -30,7 +30,11 @@
 //   });
 // }
 
+<<<<<<< HEAD
 import kv from "@/lib/kv";
+=======
+import { redis } from "@/lib/kv";
+>>>>>>> 79e72a6 (Switch persistence to Upstash Redis)
 import { getPaste, isExpired } from "@/lib/paste";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -54,7 +58,7 @@ export async function GET(
     }
 
     paste.remaining_views -= 1;
-    await kv.set(key, paste);
+    await redis.set(key, paste);
   }
 
   return NextResponse.json({

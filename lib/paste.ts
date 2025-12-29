@@ -1,13 +1,13 @@
-import kv from "./kv";
+import { redis } from "./kv";
 import { nowMs } from "./time";
 import { Paste } from "@/types/paste";
 
 export async function getPaste(id: string): Promise<Paste | null> {
-  return await kv.get<Paste>(`paste:${id}`);
+  return await redis.get<Paste>(`paste:${id}`);
 }
 
 export async function savePaste(paste: Paste) {
-  await kv.set(`paste:${paste.id}`, paste);
+  await redis.set(`paste:${paste.id}`, paste);
 }
 
 export async function isExpired(paste: Paste): Promise<boolean> {
