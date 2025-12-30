@@ -1,5 +1,3 @@
-
-
 import { redis } from "@/lib/kv";
 import { getPaste, isExpired } from "@/lib/paste";
 import { NextRequest, NextResponse } from "next/server";
