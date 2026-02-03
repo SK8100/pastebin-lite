@@ -23,7 +23,7 @@ export async function GET(
     }
 
     paste.remaining_views -= 1;
-    await redis.set(key, paste);
+    await redis.set(key, JSON.stringify(paste));
   }
 
   return NextResponse.json({
