@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 
 import { redis } from "@/lib/kv";
 import { getPaste, isExpired } from "@/lib/paste";

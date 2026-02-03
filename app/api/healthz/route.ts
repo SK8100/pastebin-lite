@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { redis } from "@/lib/kv";
 import { NextResponse } from "next/server";
 
