@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { nanoid } from "nanoid";
 import { validateCreatePaste } from "@/lib/validators";
 import { savePaste } from "@/lib/paste";
